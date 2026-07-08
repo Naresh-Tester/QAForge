@@ -1,4 +1,4 @@
-package com.orangehrm;
+package com.orangehrm.pages;
 
 import com.orangehrm.base.BaseClass;
 import org.testng.annotations.Test;
