@@ -2,22 +2,25 @@ package com.orangehrm.actiondriver;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import com.orangehrm.base.BaseClass;
 
-import java.io.File;
 import java.time.Duration;
 
 public class ActionDriver {
     private WebDriver driver;
     private WebDriverWait wait;
+
     public ActionDriver(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver,Duration.ofSeconds(30));
+        int explicitWait = Integer.parseInt(BaseClass.getProp().getProperty("explicitWait"));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(explicitWait));
+        System.out.println("WebDriver instance is created.");
          }
-    // Wait for element to be clickable
+
+         // Wait for element to be clickable
     public void waitForElementToBeClickable(By locator) {
         try {
             wait.until(ExpectedConditions.elementToBeClickable(locator));

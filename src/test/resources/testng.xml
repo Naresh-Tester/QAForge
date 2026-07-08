@@ -3,7 +3,7 @@
 <suite name="OrangeHRM-Suite">
     <test name="OrangeHRM-Test">
         <classes>
-            <class name="com.orangehrm.pages.loadingpage" />
+            <class name="com.orangehrm.test.LoginPageTest" />
         </classes>
     </test>
 </suite>
