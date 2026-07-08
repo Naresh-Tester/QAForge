@@ -51,6 +51,9 @@ build/
 /drivers/*.exe
 geckodriver.log
 
+# IntelliJ
+.idea/
+
 ### Environment/secrets ###
 .env
 *.properties.local
