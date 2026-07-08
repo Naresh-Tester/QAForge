@@ -31,11 +31,7 @@ public class ActionDriver {
 
     //Wait for element to be visible
     private void waitForElementToBeVisible(By locator) {
-        try {
-            wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-        } catch (Exception e) {
-            System.out.println("Element is not visible:" +e.getMessage());
-        }
+        wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 
     // Compare element text with expected text
@@ -99,15 +95,10 @@ public class ActionDriver {
     // Check if element is displayed
     public boolean isElementDisplayed(By locator) {
         try {
-            if (driver.findElement(locator).isDisplayed()) {
-                System.out.println("Element is displayed");
-                return true;
-            } else {
-                System.out.println("Element is not displayed");
-                return false;
-            }
+            waitForElementToBeVisible(locator);
+            return driver.findElement(locator).isDisplayed();
         } catch (Exception e) {
-            System.out.println("Element is not displayed:" + e.getMessage());
+            System.out.println("Element is not displayed: " + e.getMessage());
             return false;
         }
     }
