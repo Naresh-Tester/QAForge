@@ -5,7 +5,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import com.orangehrm.base.BaseClass;
+import com.orangehrm.utilities.ConfigReader;
 
 import java.time.Duration;
 
@@ -15,12 +15,12 @@ public class ActionDriver {
 
     public ActionDriver(WebDriver driver) {
         this.driver = driver;
-        int explicitWait = Integer.parseInt(BaseClass.getProp().getProperty("explicitWait"));
+        int explicitWait = ConfigReader.getExplicitWait();
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(explicitWait));
         System.out.println("WebDriver instance is created.");
          }
 
-         // Wait for element to be clickable
+    // Wait for element to be clickable
     public void waitForElementToBeClickable(By locator) {
         try {
             wait.until(ExpectedConditions.elementToBeClickable(locator));
@@ -219,6 +219,13 @@ public class ActionDriver {
             driver.findElement(locator).sendKeys(Keys.ENTER);
         } catch (Exception e) {
             System.out.println("Unable to press enter:" + e.getMessage());
+        }
+    }
+
+    //Switch to new tab
+    public void switchToNewTab() {
+        for (String handle : driver.getWindowHandles()) {
+            driver.switchTo().window(handle);
         }
     }
 
