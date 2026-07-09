@@ -10,14 +10,17 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 import com.orangehrm.utilities.ConfigReader;
+import org.apache.logging.log4j.Logger;
+import com.orangehrm.utilities.LoggerUtil;
 
 public class BaseClass {
 
     protected static WebDriver driver;
+    private static final Logger logger = LoggerUtil.getLogger(BaseClass.class);
 
     @BeforeMethod
     public void setup() {
-        System.out.println("Setting of WebDriver: " +this.getClass().getSimpleName());
+        logger.info("Setting up WebDriver for {}", this.getClass().getSimpleName());
         launchBrowser();
         configureBrowser();
         staticWait(2);
@@ -31,11 +34,15 @@ public class BaseClass {
         String browser = ConfigReader.getBrowser();
         if (browser.equals("chrome")) {
             driver = new ChromeDriver();
+            logger.info("Chrome browser launched");
         } else if (browser.equals("firefox")) {
             driver = new FirefoxDriver();
+            logger.info("Firefox browser launched");
         }else if (browser.equals("edge")) {
             driver = new EdgeDriver();
+            logger.info("Edge browser launched");
         }else{
+            logger.error("Invalid browser name: {}", browser);
             throw new RuntimeException("Invalid Browser Name (Try chrome, firefox, or edge): " + browser);
         }
     }
@@ -45,15 +52,18 @@ public class BaseClass {
         //Implicit Wait
         int implicitWait = ConfigReader.getImplicitWait();
         driver.manage().timeouts().implicitlyWait(java.time.Duration.ofSeconds(implicitWait));
+        logger.info("Implicit wait set to {} seconds", implicitWait);
 
         //Maximize the window
         driver.manage().window().maximize();
+        logger.info("Browser window maximized");
 
         //Navigate to URL
         try {
             driver.get(ConfigReader.getUrl());
+            logger.info("Navigated to URL: {}", ConfigReader.getUrl());
         }catch (Exception e){
-            System.out.println("Failed to navigate the URL: " + e.getMessage());
+            logger.error("Failed to navigate to URL: {}", e.getMessage());
         }
     }
 
@@ -61,10 +71,13 @@ public class BaseClass {
     //Close all browsers and end the session
     public void teardown() throws IOException {
         if (driver != null) {
-            try{
-            driver.quit();
-        }catch (Exception e){
-            System.out.println("Failed to quit driver: " + e.getMessage());}
+            try {
+                logger.info("Closing browser");
+                driver.quit();
+                logger.info("Browser closed successfully");
+            } catch (Exception e) {
+                logger.error("Failed to close browser: {}", e.getMessage());
+            }
         }
     }
 

@@ -1,52 +1,62 @@
 package com.orangehrm.actiondriver;
 
+import com.orangehrm.utilities.ConfigReader;
+import com.orangehrm.utilities.LoggerUtil;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import com.orangehrm.utilities.ConfigReader;
 
 import java.time.Duration;
 
 public class ActionDriver {
+
     private WebDriver driver;
     private WebDriverWait wait;
+    private static final Logger logger = LoggerUtil.getLogger(ActionDriver.class);
 
     public ActionDriver(WebDriver driver) {
         this.driver = driver;
         int explicitWait = ConfigReader.getExplicitWait();
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(explicitWait));
-        System.out.println("WebDriver instance is created.");
-         }
+        logger.info("ActionDriver initialized");
+    }
 
     // Wait for element to be clickable
     public void waitForElementToBeClickable(By locator) {
         try {
             wait.until(ExpectedConditions.elementToBeClickable(locator));
         } catch (Exception e) {
-            System.out.println("Element is not clickable:" + e.getMessage());
+            logger.error("Element not clickable {} : {}", locator, e.getMessage());
         }
     }
 
-    //Wait for element to be visible
+    // Wait for element to be visible
     private void waitForElementToBeVisible(By locator) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+        } catch (Exception e) {
+            logger.error("Element not visible {} : {}", locator, e.getMessage());
+        }
     }
 
     // Compare element text with expected text
     public boolean compareElementText(By locator, String expectedText) {
         try {
             String actualText = getText(locator);
+
             if (actualText.equals(expectedText.trim())) {
-                System.out.println("Text matched: " + actualText);
+                logger.info("Text matched: {}", actualText);
                 return true;
             } else {
-                System.out.println("Text mismatch. Expected: " + expectedText + " but got: " + actualText);
+                logger.error("Text mismatch. Expected: {} Actual: {}", expectedText, actualText);
                 return false;
             }
+
         } catch (Exception e) {
-            System.out.println("Unable to compare element text: " + e.getMessage());
+            logger.error("Unable to compare text {} : {}", locator, e.getMessage());
             return false;
         }
     }
@@ -56,90 +66,94 @@ public class ActionDriver {
         try {
             wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
         } catch (Exception e) {
-            System.out.println("Element is still visible:" + e.getMessage());
+            logger.error("Element still visible {} : {}", locator, e.getMessage());
         }
     }
 
-    // Click on element
+    // Click element
     public void click(By locator) {
         try {
+            logger.info("Clicking element {}", locator);
             waitForElementToBeClickable(locator);
             driver.findElement(locator).click();
         } catch (Exception e) {
-            System.out.println("Unable to click element:" + e.getMessage());
+            logger.error("Unable to click element {} : {}", locator, e.getMessage());
         }
     }
 
-    // Type text into element
+    // Type text
     public void type(By locator, String text) {
         try {
             waitForElementToBeVisible(locator);
             driver.findElement(locator).clear();
             driver.findElement(locator).sendKeys(text);
+            logger.info("Entered text into {}", locator);
         } catch (Exception e) {
-            System.out.println("Unable to type into element:" + e.getMessage());
+            logger.error("Unable to type into {} : {}", locator, e.getMessage());
         }
     }
 
-    // Get text from input field
+    // Get element text
     public String getText(By locator) {
         try {
             waitForElementToBeVisible(locator);
             return driver.findElement(locator).getText();
         } catch (Exception e) {
-            System.out.println("Unable to get text:" + e.getMessage());
+            logger.error("Unable to get text from {} : {}", locator, e.getMessage());
             return null;
         }
     }
 
-    // Check if element is displayed
+    // Verify element displayed
     public boolean isElementDisplayed(By locator) {
         try {
             waitForElementToBeVisible(locator);
             return driver.findElement(locator).isDisplayed();
         } catch (Exception e) {
-            System.out.println("Element is not displayed: " + e.getMessage());
+            logger.error("Element not displayed {} : {}", locator, e.getMessage());
             return false;
         }
     }
 
-    // Check if element is enabled
+    // Verify element enabled
     public boolean isElementEnabled(By locator) {
         try {
             return driver.findElement(locator).isEnabled();
         } catch (Exception e) {
-            System.out.println("Element is not enabled:" + e.getMessage());
+            logger.error("Element not enabled {} : {}", locator, e.getMessage());
             return false;
         }
     }
 
-    // Get count of matching elements
+    // Get element count
     public int getElementCount(By locator) {
         try {
             return driver.findElements(locator).size();
         } catch (Exception e) {
-            System.out.println("Unable to get element count:" + e.getMessage());
+            logger.error("Unable to get element count {} : {}", locator, e.getMessage());
             return 0;
         }
     }
 
-    // Select dropdown option by visible text
+    // Select dropdown by visible text
     public void selectByVisibleText(By locator, String text) {
         try {
             Select select = new Select(driver.findElement(locator));
             select.selectByVisibleText(text);
+            logger.info("Selected '{}' from {}", text, locator);
         } catch (Exception e) {
-            System.out.println("Unable to select by visible text:" + e.getMessage());
+            logger.error("Unable to select visible text {} : {}", locator, e.getMessage());
         }
     }
 
-    // Select dropdown option by value
+    // Select dropdown by value
     public void selectByValue(By locator, String value) {
         try {
             Select select = new Select(driver.findElement(locator));
             select.selectByValue(value);
+            logger.info("Selected value '{}' from {}", value, locator);
         } catch (Exception e) {
-            System.out.println("Unable to select by value:" + e.getMessage());
+            logger.error("Unable to select value {} : {}", locator, e.getMessage());
         }
     }
 
@@ -147,8 +161,9 @@ public class ActionDriver {
     public void navigateToUrl(String url) {
         try {
             driver.get(url);
+            logger.info("Navigated to {}", url);
         } catch (Exception e) {
-            System.out.println("Unable to navigate to URL:" + e.getMessage());
+            logger.error("Unable to navigate to {} : {}", url, e.getMessage());
         }
     }
 
@@ -157,7 +172,7 @@ public class ActionDriver {
         try {
             return driver.getTitle();
         } catch (Exception e) {
-            System.out.println("Unable to get page title:" + e.getMessage());
+            logger.error("Unable to get page title: {}", e.getMessage());
             return null;
         }
     }
@@ -167,7 +182,7 @@ public class ActionDriver {
         try {
             return driver.getCurrentUrl();
         } catch (Exception e) {
-            System.out.println("Unable to get current URL:" + e.getMessage());
+            logger.error("Unable to get current URL: {}", e.getMessage());
             return null;
         }
     }
@@ -176,8 +191,9 @@ public class ActionDriver {
     public void refreshPage() {
         try {
             driver.navigate().refresh();
+            logger.info("Page refreshed");
         } catch (Exception e) {
-            System.out.println("Unable to refresh page:" + e.getMessage());
+            logger.error("Unable to refresh page: {}", e.getMessage());
         }
     }
 
@@ -186,47 +202,54 @@ public class ActionDriver {
         try {
             Actions actions = new Actions(driver);
             actions.moveToElement(driver.findElement(locator)).perform();
+            logger.info("Hovered over {}", locator);
         } catch (Exception e) {
-            System.out.println("Unable to hover over element:" + e.getMessage());
+            logger.error("Unable to hover over {} : {}", locator, e.getMessage());
         }
     }
 
-    // Wait for the page to load
+    // Wait for page load
     public void waitForPageLoad(int timeOutInSec) {
         try {
-            wait.withTimeout(Duration.ofSeconds(timeOutInSec)).until(WebDriver -> ((JavascriptExecutor) WebDriver)
-                    .executeScript("return document.readyState").equals("complete"));
-            System.out.println("Page loaded successfully.");
+            wait.withTimeout(Duration.ofSeconds(timeOutInSec))
+                    .until(webDriver -> ((JavascriptExecutor) webDriver)
+                            .executeScript("return document.readyState")
+                            .equals("complete"));
+
+            logger.info("Page loaded successfully");
+
         } catch (Exception e) {
-            System.out.println("Page did not load within " + timeOutInSec + " seconds. Exception: " + e.getMessage());
+            logger.error("Page did not load within {} seconds", timeOutInSec);
         }
     }
 
-    // Scroll to an element -- Added a semicolon ; at the end of the script string
-    public void scrollToElement(By by) {
+    // Scroll to element
+    public void scrollToElement(By locator) {
         try {
             JavascriptExecutor js = (JavascriptExecutor) driver;
-            WebElement element = driver.findElement(by);
+            WebElement element = driver.findElement(locator);
             js.executeScript("arguments[0].scrollIntoView(true);", element);
+            logger.info("Scrolled to {}", locator);
         } catch (Exception e) {
-            System.out.println("Unable to locate element:" + e.getMessage());
+            logger.error("Unable to scroll to {} : {}", locator, e.getMessage());
         }
     }
 
-    // Press Enter key on element
+    // Press Enter
     public void pressEnter(By locator) {
         try {
             driver.findElement(locator).sendKeys(Keys.ENTER);
+            logger.info("Pressed ENTER on {}", locator);
         } catch (Exception e) {
-            System.out.println("Unable to press enter:" + e.getMessage());
+            logger.error("Unable to press ENTER on {} : {}", locator, e.getMessage());
         }
     }
 
-    //Switch to new tab
+    // Switch to new tab
     public void switchToNewTab() {
         for (String handle : driver.getWindowHandles()) {
             driver.switchTo().window(handle);
         }
+        logger.info("Switched to new browser tab");
     }
-
-    }
+}
