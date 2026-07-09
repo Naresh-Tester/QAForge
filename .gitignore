@@ -57,3 +57,13 @@ geckodriver.log
 ### Environment/secrets ###
 .env
 *.properties.local
+
+# Allure CLI
+.allure/
+
+# Allure output
+allure-results/
+allure-report/
+
+# Maven build
+target/
